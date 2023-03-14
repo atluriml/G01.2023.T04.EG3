@@ -14,8 +14,17 @@ class OrderRequest:
         justnow = datetime.utcnow()
         self.__time_stamp = datetime.timestamp(justnow)
 
+    def to_json (self):
+        return {
+            "product_id": self.__product_id,
+            "delivery_address": self.__delivery_address,
+            "order_type": self.__order_type,
+            "phone_number": self.__phone_number,
+            "zip_code": self.__zip_code,
+            "time_stamp": self.__time_stamp,
+        }
     def __str__(self):
-        return "OrderRequest:" + json.dumps(self.__dict__)
+        return json.dumps(self.to_json())
 
     @property
     def delivery_address( self ):
