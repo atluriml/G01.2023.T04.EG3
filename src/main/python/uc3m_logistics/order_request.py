@@ -16,6 +16,7 @@ class OrderRequest:
 
     def to_json (self):
         return {
+            "order_id": self.ord_id,
             "product_id": self.__product_id,
             "delivery_address": self.__delivery_address,
             "order_type": self.__order_type,
@@ -23,8 +24,9 @@ class OrderRequest:
             "zip_code": self.__zip_code,
             "time_stamp": self.__time_stamp,
         }
+
     def __str__(self):
-        return json.dumps(self.to_json())
+        return json.dumps(self.__dict__)
 
     @property
     def delivery_address( self ):

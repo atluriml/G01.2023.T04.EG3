@@ -1,38 +1,42 @@
 """class for testing the regsiter_order method"""
-import json
-import os
 import unittest
-import hashlib
-from uc3m_logistics import OrderManager
-from freezegun import freeze_time
-import datetime
+from uc3m_logistics import OrderManager, OrderRequest, OrderManagementException
 
 class MyTestCase(unittest.TestCase):
     """class for testing the register_order method"""
 
-    def setUpClass(cls) -> None:
-        store_path = "../../main/python/stores"
-        current_path = os.path.dirname(__file__)
-        cls.__order_request_json_store = os.path.join(current_path, store_path, "order_request.json")
+    def set_up(self):
+        #TODO
+        return 0
 
-    def setUp(self):
-        with open (self.__order_request_json_store, "w", encoding="utf-8") as file:
-            file.write("[]")
-        self.__order_manager = OrderManager()
+    def tear_down(self) -> None:
+        #TODO
+        return 0
 
-    def tearDown(self) -> None:
-        with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
-            file.write("[]")
-
-    @freeze_time("2023-03-09")
+    # todo: figure out @freeze_time
     def test_something( self ):
-        """sample test"""
-        order_id = self.__order_manager.register_order("1234567890123", "Regular", "Calle de la Luna 1", "66666666", "28001")
-        with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
-            self.assertEqual(len(order_requests), 1)
-            self.assertEqual(True, False)
-    ##TODO make sure you have the same state before and after you run the test
+        """dummy test"""
+        # TODO
+
+        #with open(self.__order_request_json_s)
+
+        # order_id_check = OrderRequest(product_id, order_type, delivery_address, ...)
+
+        self.assertEqual(True, False)
+
+    def test_order_type_valid(self):
+        self.assertIsNotNone(
+            self.__order_manager.register_order("awdwad", "Regular", "Calle de la Luna 1", "666666666", "28B 001"))
+        self.assertIsNotNone(
+            self.__order_manager.register_order("awdwad", "Premium", "Calle de la Luna 1", "666666666", "28001"))
+
+    def test_order_type_invalid(self):
+        my_order = OrderManager()
+        with self.assertRaises(OrderManagerException) as error:
+            self.__order_manager.register_order("8421691423224", "INVALID", "Calle de la Luna 1, P4 6*a", "666666666",
+                                                "28001")
+        self.assertEqual(error.exception.message, "Invalid order type: INVALID")
+
 
 if __name__ == '__main__':
     unittest.main()

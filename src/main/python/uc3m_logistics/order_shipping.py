@@ -28,6 +28,9 @@ class OrderShipping():
                self.__order_id + ",issuedate:" + self.__issued_at + \
                ",deliveryday:" + self.__delivery_day + "}"
 
+    def to_json(self):
+        # TODO
+
     @property
     def product_id( self ):
         """Property that represents the product_id of the patient"""
@@ -58,6 +61,8 @@ class OrderShipping():
     def tracking_code( self ):
         """Returns the sha256 signature of the date"""
         return hashlib.sha256(self.__signature_string().encode()).hexdigest()
+
+    return hashlib.sha256(self.__signature_string().encode()).hexdigest()
 
     @property
     def issued_at(self):
