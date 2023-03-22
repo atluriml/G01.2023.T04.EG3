@@ -24,6 +24,9 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(True, False)
 
+    def validate_order_id(self):
+
+
     def test_order_type_valid(self):
         self.assertIsNotNone(
             self.__order_manager.register_order("awdwad", "Regular", "Calle de la Luna 1", "666666666", "28B 001"))

@@ -12,6 +12,8 @@ class OrderManager:
         current_path = os.path.dirname(__file__)
         self.__order_request_json_store = os.path.join(current_path, store_path, "order_request.json")
         print("Order request store: ", self.__order_request_json_store)
+        try:
+            if not os.path...
 
         # TODO: assign path variables
         # and ensure that the files exist
@@ -72,20 +74,34 @@ class OrderManager:
         order_request = OrderRequest(product_id, order_type, address, phone_number,zip_code)
 
         # TODO: turn this into a try-catch block
-        with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
+        try:
+            with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
             data = json.load(file)
             data.append(order_request.__dict__)
             file.seek(0)
             json.dump(data, file, indent=4)
-
+        catch:
 
         return order_request.order_id
 
 
     def send_product (self,input_file_path: str):
+        with ()
+            dict1 = json.load(input_file_path) # TODO not named dict
+
+        if "OrderId" not in dict1:
+            print("fixme")
+            # TODO throw exception
+        a = dict1['order_id']
+        self.validate_orderId(a) # TODO this method doesn't exist... do we make it?
+
+
+
+
         #TODO
         # validate input file path by checkign that the file exists and that we can read from it
         # (use self asserts?)
+        # check file exists
         # check that the file is a json
         # extract data from json (OrderRequest object)
         # check that the order id is valid

@@ -16,7 +16,7 @@ class OrderRequest:
 
     def to_json (self):
         return {
-            "order_id": self.ord_id,
+            "order_id": self.order_id,
             "product_id": self.__product_id,
             "delivery_address": self.__delivery_address,
             "order_type": self.__order_type,
