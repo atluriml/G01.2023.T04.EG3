@@ -22,14 +22,22 @@ class OrderShipping():
         #__delivery_day must be expressed in senconds to be added to the timestap
         self.__delivery_day = self.__issued_at + (delivery_days * 24 * 60 * 60)
 
+    def to_json(self):
+        return {
+            "order_id": self.tracking_id,
+            "product_id": self.__product_id,
+            "delivery_address": self.__delivery_address,
+            "order_type": self.__order_type,
+            "phone_number": self.__phone_number,
+            "zip_code": self.__zip_code,
+            "time_stamp": self.__time_stamp,
+        }
+
     def __signature_string(self):
         """Composes the string to be used for generating the key for the date"""
         return "{alg:" + self.__alg +",typ:" + self.__type +",order_id:" + \
-               self.__order_id + ",issuedate:" + self.__issued_at + \
-               ",deliveryday:" + self.__delivery_day + "}"
-
-    def to_json(self):
-        # TODO
+           self.__order_id + ",issuedate:" + self.__issued_at + \
+           ",deliveryday:" + self.__delivery_day + "}"
 
     @property
     def product_id( self ):
@@ -41,11 +49,11 @@ class OrderShipping():
         self.__product_id = value
 
     @property
-    def order_id( self ):
+    def tracking_id( self ):
         """Property that represents the order_id"""
         return self.__order_id
-    @order_id.setter
-    def order_id( self, value ):
+    @tracking_id.setter
+    def tracking_id( self, value ):
         self.__order_id = value
 
     @property
@@ -61,8 +69,7 @@ class OrderShipping():
     def tracking_code( self ):
         """Returns the sha256 signature of the date"""
         return hashlib.sha256(self.__signature_string().encode()).hexdigest()
-
-    return hashlib.sha256(self.__signature_string().encode()).hexdigest()
+    #    return hashlib.sha256(self.__signature_string().encode()).hexdigest()
 
     @property
     def issued_at(self):

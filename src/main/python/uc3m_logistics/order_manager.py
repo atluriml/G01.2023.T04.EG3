@@ -1,4 +1,4 @@
-"""Module """
+"""Module"""
 import json
 import os
 from barcode import EAN13
@@ -11,15 +11,35 @@ class OrderManager:
         store_path = "../stores/"
         current_path = os.path.dirname(__file__)
         self.__order_request_json_store = os.path.join(current_path, store_path, "order_request.json")
+        self.__order_manager_json_store = os.path.join(current_path, store_path, "order_manager.json")
+        self.__order_shipping_json_store = os.path.join(current_path, store_path, "order_shipping.json")
         print("Order request store: ", self.__order_request_json_store)
-        try:
-            if not os.path...
+        print("Order manager store: ", self.__order_manager_json_store)
+        print("Order shipping store: ", self.__order_shipping_json_store)
 
-        # TODO: assign path variables
-        # and ensure that the files exist
+        try:
+            if not os.path.exists(self.__order_request_json_store):
+                with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
+                    file.write("[]")
+        except FileNotFoundError as exception: # finish
+            raise OrderManagementException("Could create/find order_request.json") from exception
+
+        try:
+            if not os.path.exists(self.__order_manager_json_store):
+                with open(self.__order_manager_json_store, "w", encoding="utf-8") as file:
+                    file.write("[]")
+        except FileNotFoundError as exception: # finish
+            raise OrderManagementException("Could create/find order_manager.json") from exception
+
+        try:
+            if not os.path.exists(self.__order_shipping_json_store):
+                with open(self.__order_shipping_json_store, "w", encoding="utf-8") as file:
+                    file.write("[]")
+        except FileNotFoundError as exception: # finish
+            raise OrderManagementException("Could create/find order_shipping.json") from exception
 
     @staticmethod
-    def validate_ean13(cls, ean13_code):
+    def validate_ean13(cls, ean13_code): #TODO ask about cls
         """RETURNS TRUE IF THE CODE RECEIVED IS A VALID EAN13,
         OR FALSE IN OTHER CASE"""
         if len(ean13_code) !=13:
@@ -28,41 +48,56 @@ class OrderManager:
             raise OrderManagementException("Invalid ean13 code: check digit is incorrect")
 
 
-    def validate_order_type(cls, order_type):
-
+    def validate_order_type(cls, order_type): #TODO ask about case sensitivity
+        """RETURNS ORDER TYPE IF VALID OR THROWS AN EXCEPTION"""
         if not isinstance(order_type, str):
             raise OrderManagementException("Invalid order type: not a string")
-        if order_type not in ["Regular", "Premium"]:
-            return order_type ## TODO double check
+        order_type.lower()
+        if order_type in ["regular", "premium"]:
+            return order_type
+        raise OrderManagementException("Invalid order type: string is invalid")
 
     @classmethod
-    def validate_address(cls, address):
+    def validate_address(cls, address): #TODO does between mean including 20 and 100 or not including
         if not isinstance(address, str):
-            raise OrderManagementException("Address is not a string")
+            raise OrderManagementException("Invalid address: address is not a string")
+        if len(address) > 100:
+            raise OrderManagementException("Invalid address: address is too long")
+        if len(address) < 20:
+            raise OrderManagementException("Invalid address: address is too short")
+        if " " not in address:
+            raise OrderManagementException("Invalid address: address should contain a space")
         return address
 
     @classmethod
-    def validate_phone_number(cls, phone_number):
-        # TODO: deal with prefix and also check phone number in general
-        # TODO i.e. all digits and doesn't start with 211
+    def validate_phone_number(cls, phone_number): # TODO is the prefix 211 or 34
+        if not isinstance(phone_number, str):
+            raise OrderManagementException("Invalid phone number: phone number is not a string")
+        if len(phone_number) > 12:
+            raise OrderManagementException("Invalid phone number: phone number is too long")
+        if len(phone_number) < 12:
+            raise OrderManagementException("Invalid phone number: phone number is too short")
+        if phone_number[0 : 2] != "+34":
+            raise OrderManagementException("Invalid phone number: wrong area code")
         return phone_number
 
     @classmethod
-    def validate_zip_code(cls, zip_code:str):
+    def validate_zip_code(cls, zip_code: str): #TODO is the range correct
         if not isinstance(zip_code, str):
-            raise OrderManagementException("Invalid zip code: not a string")
+            raise OrderManagementException("Invalid zip code: zip code not a string")
         if not len(zip_code) == 5:
             raise OrderManagementException("Invalid zip code: zip code not 5 characters")
         if not zip_code.isdigit():
             raise OrderManagementException("Invalid zip code: characters are not digits")
-        if not (1 <= int(zip_code[:2]) <= 52):
-            # TODO: is this right
-            return OrderManagementException("Invalid zip code: prefix invalid")
+        if int(zip_code) < 1001:
+            return OrderManagementException("Invalid zip code: zip code is below range")
+        if int(zip_code) > 52006:
+            return OrderManagementException("Invalid zip code: zip code is above range")
         return zip_code
 
     # pylint: disable=too-many-arguments
     def register_order(self, product_id: str, order_type: str, address: str, phone_number: str,
-                       zip_code: int) -> str:
+                       zip_code: str) -> str:
 
         # check validity all of the arguments
         self.validate_ean13(product_id)
@@ -73,32 +108,30 @@ class OrderManager:
 
         order_request = OrderRequest(product_id, order_type, address, phone_number,zip_code)
 
-        # TODO: turn this into a try-catch block
         try:
             with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
-            data = json.load(file)
-            data.append(order_request.__dict__)
+                data = json.load(file)
+            data.append(order_request.to_json())
             file.seek(0)
             json.dump(data, file, indent=4)
-        catch:
-
+        except FileNotFoundError as exception: # TODO is this the more specific exception
+            raise OrderManagementException("Could not write to file") from exception
         return order_request.order_id
 
 
-    def send_product (self,input_file_path: str):
-        with ()
-            dict1 = json.load(input_file_path) # TODO not named dict
-
-        if "OrderId" not in dict1:
-            print("fixme")
-            # TODO throw exception
-        a = dict1['order_id']
-        self.validate_orderId(a) # TODO this method doesn't exist... do we make it?
-
-
-
-
-        #TODO
+    # def send_product (self,input_file_path: str): # SECOND function
+    #     with ()
+    #         dict1 = json.load(input_file_path) # TODO not named dict
+    #
+    #     if "OrderId" not in dict1:
+    #         print("fixme")
+    #         # TODO throw exception
+    #     a = dict1['order_id']
+    #     self.validate_orderId(a) # TODO this method doesn't exist... do we make it?
+    #
+    #
+    #
+            #TODO
         # validate input file path by checkign that the file exists and that we can read from it
         # (use self asserts?)
         # check file exists
