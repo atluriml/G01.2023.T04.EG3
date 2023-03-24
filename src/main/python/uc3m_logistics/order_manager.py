@@ -39,26 +39,29 @@ class OrderManager:
             raise OrderManagementException("Could create/find order_shipping.json") from exception
 
     @staticmethod
-    def validate_ean13(cls, ean13_code): #TODO ask about cls
+    def validate_ean13(ean13_code):
         """RETURNS TRUE IF THE CODE RECEIVED IS A VALID EAN13,
         OR FALSE IN OTHER CASE"""
         if len(ean13_code) !=13:
             raise OrderManagementException("Invalid ean13 code: not a 13 digit string")
+        if not ean13_code.isdigit():
+            raise OrderManagementException("Invalid ean13 code: not a 13 digit string")
         if str(EAN13(ean13_code).calculate_checksum()) != ean13_code[-1]:
-            raise OrderManagementException("Invalid ean13 code: check digit is incorrect")
+            return ean13_code
+        raise OrderManagementException("Invalid ean13 code: check digit is incorrect")
 
 
-    def validate_order_type(cls, order_type): #TODO ask about case sensitivity
+    def validate_order_type(cls, order_type):
         """RETURNS ORDER TYPE IF VALID OR THROWS AN EXCEPTION"""
         if not isinstance(order_type, str):
             raise OrderManagementException("Invalid order type: not a string")
-        order_type.lower()
+        order_type = order_type.lower()
         if order_type in ["regular", "premium"]:
             return order_type
         raise OrderManagementException("Invalid order type: string is invalid")
 
     @classmethod
-    def validate_address(cls, address): #TODO does between mean including 20 and 100 or not including
+    def validate_address(cls, address): #TODO does between mean including 20 and 100 or not including include in write-up
         if not isinstance(address, str):
             raise OrderManagementException("Invalid address: address is not a string")
         if len(address) > 100:
@@ -77,7 +80,7 @@ class OrderManager:
             raise OrderManagementException("Invalid phone number: phone number is too long")
         if len(phone_number) < 12:
             raise OrderManagementException("Invalid phone number: phone number is too short")
-        if phone_number[0 : 2] != "+34":
+        if phone_number[0:3] != "+34":
             raise OrderManagementException("Invalid phone number: wrong area code")
         return phone_number
 
@@ -111,11 +114,13 @@ class OrderManager:
         try:
             with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
                 data = json.load(file)
-            data.append(order_request.to_json())
-            file.seek(0)
-            json.dump(data, file, indent=4)
-        except FileNotFoundError as exception: # TODO is this the more specific exception
+                data.append(order_request.to_json())
+                file.seek(0)
+                json.dump(data, file, indent=4)
+        except Exception as exception: # TODO is this the more specific exception
             raise OrderManagementException("Could not write to file") from exception
+     #   except Exception as exception:
+      #      print ("other error" +  exception)
         return order_request.order_id
 
 

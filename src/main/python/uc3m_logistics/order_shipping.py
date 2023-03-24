@@ -24,20 +24,26 @@ class OrderShipping():
 
     def to_json(self):
         return {
-            "order_id": self.tracking_id,
-            "product_id": self.__product_id,
-            "delivery_address": self.__delivery_address,
-            "order_type": self.__order_type,
-            "phone_number": self.__phone_number,
-            "zip_code": self.__zip_code,
-            "time_stamp": self.__time_stamp,
+            "alg": self.__alg,
+            "type": self.__type,
+            "order_id": self.__order_id,
+            "issued_at": self.__issued_at,
+            "delivery_day": self.__delivery_day,
+            "tracking_code": self.__tracking_code,
         }
 
     def __signature_string(self):
         """Composes the string to be used for generating the key for the date"""
         return "{alg:" + self.__alg +",typ:" + self.__type +",order_id:" + \
            self.__order_id + ",issuedate:" + self.__issued_at + \
-           ",deliveryday:" + self.__delivery_day + "}"
+           ",deliveryday:" + self.__delivery_day + "}" #TODO do we need to need include the tracking code
+
+    @property
+    def alg( self ):
+        return self.__alg
+    @alg.setter
+    def alg( self, value ):
+        self.__alg= value
 
     @property
     def product_id( self ):
@@ -84,3 +90,7 @@ class OrderShipping():
     def delivery_day( self ):
         """Returns the delivery day for the order"""
         return self.__delivery_day
+
+    @delivery_day.setter
+    def delivery_day(self, value):
+        self.__delivery_day = value
