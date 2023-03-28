@@ -93,9 +93,9 @@ class OrderManager:
         if not zip_code.isdigit():
             raise OrderManagementException("Invalid zip code: characters are not digits")
         if int(zip_code) < 1001:
-            return OrderManagementException("Invalid zip code: zip code is below range")
+            raise OrderManagementException("Invalid zip code: zip code is below range")
         if int(zip_code) > 52006:
-            return OrderManagementException("Invalid zip code: zip code is above range")
+            raise OrderManagementException("Invalid zip code: zip code is above range")
         return zip_code
 
     # pylint: disable=too-many-arguments

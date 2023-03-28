@@ -5,13 +5,14 @@ import os
 import unittest
 from datetime import datetime
 
-import freezegun
-
 from uc3m_logistics import OrderManager, OrderRequest, OrderManagementException
 
 class RegisterOrderTests(unittest.TestCase):
     """class for testing the register_order method"""
     #TODO make sure to add the test id for these tests
+
+    __order_request_json_store: str = None
+
     @classmethod
     def setUpClass(cls) -> None:
         store_path = "../../main/python/stores/"
@@ -25,8 +26,8 @@ class RegisterOrderTests(unittest.TestCase):
 
     #TODO how to test the file path for the output tests
     def tear_down(self) -> None:
-        #TODO what do i do here
-        return 0
+        with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
+            file.write("[]")
 
     # order id test
     def validate_output_content(self):
