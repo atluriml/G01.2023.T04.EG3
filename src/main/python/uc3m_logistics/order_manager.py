@@ -112,7 +112,7 @@ class OrderManager:
         order_request = OrderRequest(product_id, order_type, address, phone_number,zip_code)
 
         try:
-            with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
+            with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
                 data = json.load(file)
                 data.append(order_request.to_json())
                 file.seek(0)
