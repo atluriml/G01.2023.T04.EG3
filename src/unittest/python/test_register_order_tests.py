@@ -4,6 +4,7 @@ import json
 import os
 import unittest
 from datetime import datetime
+from freezegun import freeze_time
 
 from uc3m_logistics import OrderManager, OrderRequest, OrderManagementException
 
@@ -30,7 +31,8 @@ class RegisterOrderTests(unittest.TestCase):
             file.write("[]")
 
     # order id test
-    def validate_output_content(self):
+    @freeze_time("2023-03-09")
+    def test_validate_output_content(self):
         """ test id: CV_V_ 27 """
         product_id = "8421691423220"
         order_type = "Regular"
@@ -57,7 +59,7 @@ class RegisterOrderTests(unittest.TestCase):
                 "zip_code": zip_code,
                 "time_stamp": datetime.strptime("2023-03-09"),
             })
-    def validate_order_id(self):
+    def test_validate_order_id(self):
         product_id = "8421691423220"
         order_type = "Regular"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
