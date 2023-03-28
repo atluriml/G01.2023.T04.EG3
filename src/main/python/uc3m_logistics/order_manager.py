@@ -46,10 +46,23 @@ class OrderManager:
             raise OrderManagementException("Invalid ean13 code: not a 13 digit string")
         if not ean13_code.isdigit():
             raise OrderManagementException("Invalid ean13 code: not a 13 digit string")
-        if str(EAN13(ean13_code).calculate_checksum()) != ean13_code[-1]:
-            return ean13_code
-        raise OrderManagementException("Invalid ean13 code: check digit is incorrect")
-
+        barcode_sum = 0
+        for i in range(0, len(ean13_code), 1):
+            if i == len(ean13_code) - 1:
+                continue
+            if i % 2 == 0:  # if the position is even, the weight is 3
+                barcode_sum += (1 * int(ean13_code[i]))
+            else:
+                barcode_sum += (3 * int(ean13_code[i]))
+        # validate checkdigit
+        if barcode_sum % 10 == 0:
+            expected_checkdigit = (int(barcode_sum / 10) * 10) - barcode_sum
+        else:
+            expected_checkdigit = \
+                ((int(barcode_sum / 10) + 1) * 10) - barcode_sum
+        if not expected_checkdigit == int(ean13_code[-1]):
+            raise OrderManagementException("Invalid ean13 code: check digit is incorrect")
+        return ean13_code
 
     def validate_order_type(cls, order_type):
         """RETURNS ORDER TYPE IF VALID OR THROWS AN EXCEPTION"""
@@ -117,10 +130,8 @@ class OrderManager:
                 data.append(order_request.to_json())
                 file.seek(0)
                 json.dump(data, file, indent=4)
-        except Exception as exception: # TODO is this the more specific exception
+        except Exception as exception:
             raise OrderManagementException("Could not write to file") from exception
-     #   except Exception as exception:
-      #      print ("other error" +  exception)
         return order_request.order_id
 
 

@@ -26,6 +26,7 @@ class OrderRequest:
         }
 
     def __str__(self):
+        print("b",self.__dict__)
         return json.dumps(self.__dict__)
 
     @property
