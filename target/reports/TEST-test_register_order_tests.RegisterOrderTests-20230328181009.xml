@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="test_register_order_tests.RegisterOrderTests-20230328181009" tests="25" file="test_register_order_tests.py" time="0.048" timestamp="2023-03-28T18:10:10" failures="1" errors="0" skipped="0">
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_invalid_no_space" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_invalid_too_long" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_invalid_too_short" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_not_string" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_valid" time="0.005" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_invalid_wrong" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_not_string" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_valid_premium" time="0.004" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_valid_regular" time="0.003" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_invalid_area_code" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_not_string" time="0.002" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_too_long" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_too_short" time="0.001" timestamp="2023-03-28T18:10:09"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_valid" time="0.004" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_invalid_too_long" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_invalid_too_short" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_not_number" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_valid" time="0.004" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_above_range" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_invalid_length" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_not_digits" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_not_string" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_under_range" time="0.001" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_valid" time="0.004" timestamp="2023-03-28T18:10:10"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_invalid_checksum" time="0.004" timestamp="2023-03-28T18:10:10">
+		<failure type="AssertionError" message="OrderManagementException not raised"><![CDATA[Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 59, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 591, in run
+    self._callTestMethod(testMethod)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 549, in _callTestMethod
+    method()
+  File "/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/unittest/python/test_register_order_tests.py", line 93, in test_product_id_invalid_checksum
+    with self.assertRaises(OrderManagementException) as exception:
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 226, in __exit__
+    self._raiseFailure("{} not raised".format(exc_name))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 163, in _raiseFailure
+    raise self.test_case.failureException(msg)
+AssertionError: OrderManagementException not raised
+]]></failure>
+	</testcase>
+</testsuite>
