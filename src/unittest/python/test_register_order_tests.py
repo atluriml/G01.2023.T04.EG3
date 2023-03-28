@@ -44,27 +44,20 @@ class RegisterOrderTests(unittest.TestCase):
             previous_json_items = len(order_requests)
 
         order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-        print("a", json.dumps({
-            '_OrderRequest__product_id': product_id,
-            '_OrderRequest__delivery_address': delivery_address,
-            '_OrderRequest__order_type': order_type,
-            '_OrderRequest__phone_number': phone_number,
-            '_OrderRequest__zip_code': zip_code,
-            '_OrderRequest__time_stamp': datetime.timestamp(datetime.utcnow()),
-        }))
         with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
             order_requests = json.load(file)
             self.assertEqual(len(order_requests), previous_json_items + 1)
             order_request = order_requests[0]
             self.assertDictEqual(order_request, {
-                "order_id": order_id,
-                "product_id": product_id,
-                "order_type": order_type,
-                "delivery_address": delivery_address,
-                "phone_number": phone_number,
-                "zip_code": zip_code,
-                "time_stamp": datetime.strptime("2023-03-09"),
+                'order_id': order_id,
+                'product_id': product_id,
+                'order_type': order_type,
+                'delivery_address': delivery_address,
+                'phone_number': phone_number,
+                'zip_code': zip_code,
+                'time_stamp': datetime.timestamp(datetime.utcnow()),
             })
+    @freeze_time("2023-03-09")
     def test_validate_order_id(self):
         product_id = '8421691423220'
         order_type = 'Regular'
@@ -73,14 +66,6 @@ class RegisterOrderTests(unittest.TestCase):
         zip_code = '28005'
 
         order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-        print("a",json.dumps({
-            '_OrderRequest__product_id': product_id,
-            '_OrderRequest__delivery_address': delivery_address,
-            '_OrderRequest__order_type': order_type,
-            '_OrderRequest__phone_number': phone_number,
-            '_OrderRequest__zip_code': zip_code,
-            '_OrderRequest__time_stamp': datetime.timestamp(datetime.utcnow()),
-        }))
         order_id_check = hashlib.md5(json.dumps({
             '_OrderRequest__product_id': product_id,
             '_OrderRequest__delivery_address': delivery_address,

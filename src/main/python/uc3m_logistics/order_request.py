@@ -26,7 +26,6 @@ class OrderRequest:
         }
 
     def __str__(self):
-        print("b",self.__dict__)
         return json.dumps(self.__dict__)
 
     @property
@@ -71,7 +70,7 @@ class OrderRequest:
     @property
     def order_id( self ):
         """Returns the md5 signature"""
-        return hashlib.md5(self.__str__().encode()).hexdigest()
+        return hashlib.md5(self.__str__().encode("utf-8")).hexdigest()
 
     @property
     def zip_code( self ):
