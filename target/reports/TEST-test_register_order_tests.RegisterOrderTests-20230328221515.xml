@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="test_register_order_tests.RegisterOrderTests-20230328221515" tests="27" file="test_register_order_tests.py" time="0.093" timestamp="2023-03-28T22:15:16" failures="0" errors="0" skipped="0">
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_invalid_no_space" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_invalid_too_long" time="0.001" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_invalid_too_short" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_not_string" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_address_valid" time="0.003" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_invalid_wrong" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_not_string" time="0.001" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_valid_premium" time="0.004" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_order_type_valid_regular" time="0.005" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_invalid_area_code" time="0.005" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_not_string" time="0.003" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_too_long" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_too_short" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_phone_number_valid" time="0.004" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_invalid_checksum" time="0.003" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_invalid_too_long" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_invalid_too_short" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_not_number" time="0.001" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_product_id_valid" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_validate_order_id" time="0.029" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_validate_output_content" time="0.006" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_above_range" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_invalid_length" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_not_digits" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_not_string" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_under_range" time="0.002" timestamp="2023-03-28T22:15:15"/>
+	<testcase classname="test_register_order_tests.RegisterOrderTests" name="test_zip_code_valid" time="0.002" timestamp="2023-03-28T22:15:16"/>
+</testsuite>
