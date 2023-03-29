@@ -1,4 +1,4 @@
-"""Module"""
+"""Order Manager File"""
 import datetime
 import json
 import os
@@ -138,22 +138,16 @@ class OrderManager:
         # opening order request json
         with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
             data = json.load(file)
-            # if "order_id" not in data:
-            #     raise OrderidNotFoundException("order id is not found")
-            # expected_order_id = data["order_id"]
-        does_order_id_exist = False
-        for order_request_object in data:
-            if order_request_object["OrderRequest.__order_id"] == order_id:
-                does_order_id_exist = True
-                product_id = order_request_object["OrderRequest.__product_id"]
-                order_type = order_request_object["OrderRequest.__order_type"]
-                delivery_address = order_request_object["OrderRequest.__delivery_address"]
-                delivery_phone_number = order_request_object["OrderRequest.__phone_number"]
-                zip_code = order_request_object["OrderRequest.__zip_code"]
-                expected_order_id = order_request_object["OrderRequest.__order_id"]
-        if not does_order_id_exist:
-            raise OrderManagementException("Invalid OrderID: Order does not exist in order request json")
-        assert order_id == expected_order_id, "order id is not valid" #TODO not sure if this is correct
+        if data["order_id"] == order_id:
+            product_id = data["product_id"]
+            order_type = data["order_type"]
+            delivery_address = data["delivery_address"]
+            delivery_phone_number = data["phone_number"]
+            zip_code = data["zip_code"]
+            expected_order_id = data["order_id"]
+        else:
+            raise OrderManagementException("Invalid OrderID: Order id is not in order request json")
+        assert order_id == expected_order_id, "Invalid OrderID: order ids are not equal"
         return OrderRequest(product_id, order_type, delivery_address, delivery_phone_number, zip_code)
 
     @classmethod
@@ -193,21 +187,18 @@ class OrderManager:
                     raise OrderidNotFoundException("Send product: Input file does not have order id")
                 order_id = data["OrderID"]
         except FileNotFoundError as exception:
-            raise FileNotFoundError(str(exception)) from exception
+            raise FileNotFoundError("Send product: Input file does not exist") from exception
         except json.decoder.JSONDecodeError as exception:
-            raise json.decoder.JSONDecodeError(str(exception), input_file_path, 0)
+            raise json.decoder.JSONDecodeError("Send product: Input file json is incorrect", input_file_path, 0) from exception
         except OrderidNotFoundException as exception:
             raise OrderidNotFoundException(str(exception)) from exception
-        except AssertionError as exception:
-            raise AssertionError(str(exception)) from exception
         except Exception as exception:
-            raise OrderManagementException(str(exception)) from exception
+            raise OrderManagementException("Send product: Error with the input file") from exception
 
         order_request = self.validate_orderid(order_id)
 
         # creating order shipping object
         order_shipping = OrderShipping(order_request.product_id, order_request.order_id, order_request.phone_number, order_request.order_type)
-
         # opening order shipping json
         try:
             with open(self.__order_shipping_json_store, "r+", encoding="utf-8") as file:
@@ -216,8 +207,7 @@ class OrderManager:
                 file.seek(0)
                 json.dump(data, file, indent=4)
         except Exception as exception:
-            raise OrderManagementException("Error writing Order Shipping information to file") \
-                from exception
+            raise OrderManagementException("Send product: Cannot write to Order Shipping file") from exception
 
         # tracking code of the shipping request is returned
         return order_shipping.tracking_code
