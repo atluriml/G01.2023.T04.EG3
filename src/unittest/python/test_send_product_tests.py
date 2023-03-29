@@ -98,3 +98,5 @@ class SendProductTests(unittest.TestCase):
                 print("Non-expected exception: ", file_path)
                 print(type(exception))
                 raise Exception(str(exception))
+if __name__ == '__main__':
+    unittest.main()
