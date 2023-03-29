@@ -1,4 +1,5 @@
 """Module"""
+import datetime
 import json
 import os
 import string
@@ -12,6 +13,7 @@ from .order_id_not_found_exception import OrderidNotFoundException
 from .order_request import OrderRequest
 
 from freezegun import freeze_time
+from datetime import datetime
 
 
 class OrderManager:
@@ -169,6 +171,9 @@ class OrderManager:
             expected_order_id = data["order_id"]
         assert order_id == expected_order_id, "order id is not valid"
 
+    def validate_tracking_code(self, tracking_code):
+        self.is_hexadecimal(tracking_code)
+
     def send_product(self, input_file_path: str):  # SECOND function
         try:
             with open(input_file_path, "r+", encoding="utf-8") as file:
@@ -217,3 +222,23 @@ class OrderManager:
     #
     #
     #
+
+    def deliver_product(self, tracking_code: str):
+        # check if the tracking code is valid
+        # register tracking code intonto a file the timestamp (UTC time) of the delivery and the tracking code value
+
+        self.validate_tracking_code(tracking_code)
+
+        delivery_time = datetime.utcnow()
+        tracking_and_delivery = "Tracking code"
+
+        try:
+            with open(self.__order_manager_json_store, "w", encoding="utf-8") as file:
+                data = json.load(file)
+                data.append(str(delivery_time).to_json())
+                json.dump(data, file, indent=4)
+        except Exception as exception:
+            raise OrderManagementException("Could not write to file") from exception
+
+        return tracking_code
+
