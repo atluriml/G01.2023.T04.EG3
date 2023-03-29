@@ -2,6 +2,7 @@
 import json
 import os
 import string
+import unittest
 
 from barcode import EAN13
 
@@ -166,8 +167,7 @@ class OrderManager:
             if "order_id" not in data:
                 raise OrderidNotFoundException("order id is not found")
             expected_order_id = data["order_id"]
-        if not self.assertEqual(order_id, expected_order_id):
-            raise Exception("order id is not valid")
+        assert order_id == expected_order_id, "order id is not valid"
 
     def send_product(self, input_file_path: str):  # SECOND function
         try:
@@ -178,21 +178,18 @@ class OrderManager:
                 order_id = data["OrderID"]
                 self.validate_orderid(order_id)
         except FileNotFoundError as exception:
-            raise FileNotFoundError(str(exception))
+            raise FileNotFoundError(str(exception)) from exception
         except json.decoder.JSONDecodeError as exception:
             raise json.decoder.JSONDecodeError(str(exception), input_file_path, 0)
         except OrderidNotFoundException as exception:
-            raise OrderidNotFoundException(str(exception))
+            raise OrderidNotFoundException(str(exception)) from exception
+        except AssertionError as exception:
+            raise AssertionError(str(exception)) from exception
         except Exception as exception:
-            raise OrderManagementException(str(exception))
+            raise OrderManagementException(str(exception)) from exception
 
-        #
-        #     if "OrderId" not in dict1:
-        #         print("fixme")
-        #         # TODO throw exception
-        #
-
-        shipping = OrderShipping(data.product_id, data.order_id, data.delivery_phone_number, data.order_type)
+        shipping = OrderShipping(data["product_id"], data["order_id"], data["delivery_phone_number"],
+                                 data["order_type"])
 
         json.dump(shipping, self.__order_shipping_json_store, indent=4)
 

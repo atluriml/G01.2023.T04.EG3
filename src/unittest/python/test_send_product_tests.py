@@ -10,6 +10,8 @@ from uc3m_logistics.order_id_not_found_exception import OrderidNotFoundException
 
 class SendProductTests(unittest.TestCase):
 
+    __order_request_json_store = None
+
     @classmethod
     def setUpClass(cls) -> None:
         store_path = "../../main/python/stores/"
@@ -24,12 +26,13 @@ class SendProductTests(unittest.TestCase):
         order_type = "Regular"
         phone_number = "+34123456789"
         zip_code = "28005"
-        time_stamp =  "1678320000.0"
+        time_stamp = "1678320000.0"
 
         order_request = OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code)
 
-        with open(cls.__order_request_json_store, "w", encoding="utf-8") as file:
-            file.write(str(order_request.to_json()))
+        with open(cls.__order_request_json_store, "w+", encoding="utf-8") as file:
+            order_request_json = order_request.to_json()
+            json.dump(order_request_json, file, indent=4)
 
     def setUp(self):
         with open(self.__order_shipping_json_store, "w", encoding="utf-8") as file:
@@ -38,8 +41,8 @@ class SendProductTests(unittest.TestCase):
     def tearDown(self):
         with open(self.__order_shipping_json_store, "w", encoding="utf-8") as file:
             file.write("[]")
-        with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
-            file.write("[]")
+        #with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
+    #    file.write("[]")
 
     def single_file_test(self, file_path):
         try:
@@ -53,6 +56,8 @@ class SendProductTests(unittest.TestCase):
             raise OrderidNotFoundException(str(exception))
         except OrderManagementException as exception:
             raise OrderManagementException(str(exception))
+        except AssertionError as exception:
+            raise AssertionError(str(exception))
         except Exception as exception:
             raise Exception(str(exception))
 
@@ -90,7 +95,7 @@ class SendProductTests(unittest.TestCase):
                     continue
                 file_path = os.path.join(directory, filename)
                 self.single_file_test(file_path)
-            except OrderManagementException as exception:
+            except AssertionError as exception:
                 print("expected exception: ", str(exception))
             except Exception as exception:
                 print("Non-expected exception")
