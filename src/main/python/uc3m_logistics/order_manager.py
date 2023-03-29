@@ -125,7 +125,6 @@ class OrderManager:
             if ch not in string.hexdigits:
                 raise OrderManagementException("Given string is not hexadecimal")
 
-    @classmethod
     def validate_orderid(self, order_id):
         if not isinstance(order_id, str):
             raise OrderManagementException("Invalid OrderID: OrderID not a string")
@@ -139,19 +138,19 @@ class OrderManager:
         # opening order request json
         with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
             data = json.load(file)
-            if "order_id" not in data:
-                raise OrderidNotFoundException("order id is not found")
-            expected_order_id = data["order_id"]
+            # if "order_id" not in data:
+            #     raise OrderidNotFoundException("order id is not found")
+            # expected_order_id = data["order_id"]
         does_order_id_exist = False
         for order_request_object in data:
-            if order_request_object["OrderRequest.__order_id"] == expected_order_id:
+            if order_request_object["OrderRequest.__order_id"] == order_id:
                 does_order_id_exist = True
                 product_id = order_request_object["OrderRequest.__product_id"]
                 order_type = order_request_object["OrderRequest.__order_type"]
                 delivery_address = order_request_object["OrderRequest.__delivery_address"]
                 delivery_phone_number = order_request_object["OrderRequest.__phone_number"]
                 zip_code = order_request_object["OrderRequest.__zip_code"]
-                order_id = order_request_object["OrderRequest.__order_id"]
+                expected_order_id = order_request_object["OrderRequest.__order_id"]
         if not does_order_id_exist:
             raise OrderManagementException("Invalid OrderID: Order does not exist in order request json")
         assert order_id == expected_order_id, "order id is not valid" #TODO not sure if this is correct

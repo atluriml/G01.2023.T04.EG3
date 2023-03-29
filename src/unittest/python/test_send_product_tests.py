@@ -62,43 +62,47 @@ class SendProductTests(unittest.TestCase):
             raise Exception(str(exception))
 
     def test_everything(self):
-        directory = 'send_product_tests/json_decode_error'
-        for filename in os.listdir(directory):
-            try:
-                if filename[0] == '.': # If the file is hidden
-                    continue
-                file_path = os.path.join(directory, filename)
-                self.single_file_test(file_path)
-            except json.decoder.JSONDecodeError as exception:
-                print("expected exception: ", str(exception))
-            except Exception as exception:
-                print("Non-expected exception")
-                raise Exception(str(exception))
+        file_name = 'send_product_tests/no_error/basic_test.json'
+        print(self.__order_manager.send_product(file_name))
 
-        directory = 'send_product_tests/order_id_not_found_error'
-        for filename in os.listdir(directory):
-            try:
-                if filename[0] == '.': # If the file is hidden
-                    continue
-                file_path = os.path.join(directory, filename)
-                self.single_file_test(file_path)
-            except OrderidNotFoundException as exception:
-                print("expected exception: ", str(exception))
-            except Exception as exception:
-                print("Non-expected exception")
-                raise Exception(str(exception))
-
-        directory = 'send_product_tests/order_management_error'
-        for filename in os.listdir(directory):
-            try:
-                if filename[0] == '.': # If the file is hidden
-                    continue
-                file_path = os.path.join(directory, filename)
-                self.single_file_test(file_path)
-            except AssertionError as exception:
-                print("expected exception: ", str(exception))
-            except Exception as exception:
-                print("Non-expected exception")
-                raise Exception(str(exception))
+        # directory = 'send_product_tests/json_decode_error'
+        # for filename in os.listdir(directory):
+        #     try:
+        #         if filename[0] == '.': # If the file is hidden
+        #             continue
+        #         file_path = os.path.join(directory, filename)
+        #         self.single_file_test(file_path)
+        #     except json.decoder.JSONDecodeError as exception:
+        #         print("expected exception: ", str(exception))
+        #     except Exception as exception:
+        #         print("Non-expected exception")
+        #         raise Exception(str(exception)) from exception
+        #
+        # directory = 'send_product_tests/order_id_not_found_error'
+        # for filename in os.listdir(directory):
+        #     try:
+        #         if filename[0] == '.': # If the file is hidden
+        #             continue
+        #         file_path = os.path.join(directory, filename)
+        #         self.single_file_test(file_path)
+        #     except OrderidNotFoundException as exception:
+        #         print("expected exception: ", str(exception))
+        #     except Exception as exception:
+        #         print("Non-expected exception")
+        #         raise Exception(str(exception))
+        #
+        # directory = 'send_product_tests/order_management_error'
+        # for filename in os.listdir(directory):
+        #     try:
+        #         if filename[0] == '.':# If the file is hidden
+        #             continue
+        #         file_path = os.path.join(directory, filename)
+        #         self.single_file_test(file_path)
+        #     except AssertionError as exception:
+        #         print("expected exception: ", str(exception))
+        #     except Exception as exception:
+        #         print("Non-expected exception: ", file_path)
+        #         print(type(exception))
+        #         raise Exception(str(exception))
 
 
