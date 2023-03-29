@@ -21,6 +21,7 @@ class RegisterOrderTests(unittest.TestCase):
         cls.__order_request_json_store = os.path.join(current_path, store_path, "order_request.json")
         cls.__order_manager = OrderManager()
 
+
     def setUp(self):
         with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
             file.write("[]")

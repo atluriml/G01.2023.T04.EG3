@@ -10,6 +10,8 @@ from .order_management_exception import OrderManagementException
 from .order_id_not_found_exception import OrderidNotFoundException
 from .order_request import OrderRequest
 
+from freezegun import freeze_time
+
 
 class OrderManager:
     """Class for providing the methods for managing the orders"""
@@ -120,6 +122,7 @@ class OrderManager:
         return zip_code
 
     # pylint: disable=too-many-arguments
+    @freeze_time('2023-03-09')
     def register_order(self, product_id: str, order_type: str, address: str, phone_number: str,
                        zip_code: str) -> str:
 
@@ -137,19 +140,34 @@ class OrderManager:
                 data = json.load(file)
                 data.append(order_request.to_json())
                 file.seek(0)
+                print(data)
                 json.dump(data, file, indent=4)
         except Exception as exception:
             raise OrderManagementException("Could not write to file") from exception
         return order_request.order_id
 
-    def validate_orderid(self, order_id):
-        if not isinstance(order_id, str):
+    def is_hexadecimal(self, string):
+        if not isinstance(string, str):
             raise OrderManagementException("Invalid OrderID: OrderID not a string")
-        if len(order_id) != 32:
+        if len(string) != 32:
             raise OrderManagementException("Invalid OrderID: OrderID length not 32 characters")
-        for ch in order_id:
+        for ch in string:
             if ch not in string.hexdigits:
                 raise OrderManagementException("Invalid OrderID: orderID not hexadecimal")
+
+    def validate_orderid(self, order_id):
+        try:
+            self.is_hexadecimal(order_id)
+        except Exception as exception:
+            raise OrderManagementException(str(exception))
+
+        with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            if "order_id" not in data:
+                raise OrderidNotFoundException("order id is not found")
+            expected_order_id = data["order_id"]
+        if not self.assertEqual(order_id, expected_order_id):
+            raise Exception("order id is not valid")
 
     def send_product(self, input_file_path: str):  # SECOND function
         try:
@@ -157,7 +175,7 @@ class OrderManager:
                 data = json.load(file)
                 if "OrderID" not in data:
                     raise OrderidNotFoundException("order id not found")
-                order_id = data['order_id']
+                order_id = data["OrderID"]
                 self.validate_orderid(order_id)
         except FileNotFoundError as exception:
             raise FileNotFoundError(str(exception))

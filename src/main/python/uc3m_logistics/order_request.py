@@ -2,9 +2,11 @@
 import hashlib
 import json
 from datetime import datetime
+from freezegun import freeze_time
 
 class OrderRequest:
     """Class representing one order for a product"""
+    @freeze_time("2023-03-09")
     def __init__( self, product_id, order_type, delivery_address, phone_number, zip_code ):
         self.__product_id = product_id
         self.__delivery_address = delivery_address
