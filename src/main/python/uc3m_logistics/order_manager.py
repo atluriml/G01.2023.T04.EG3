@@ -146,16 +146,16 @@ class OrderManager:
             raise OrderManagementException("Could not write to file") from exception
         return order_request.order_id
 
-    def is_hexadecimal(self, string):
-        if not isinstance(string, str):
-            raise OrderManagementException("Invalid OrderID: OrderID not a string")
-        if len(string) != 32:
-            raise OrderManagementException("Invalid OrderID: OrderID length not 32 characters")
-        for ch in string:
+    def is_hexadecimal(self, check_string : str):
+        for ch in check_string:
             if ch not in string.hexdigits:
-                raise OrderManagementException("Invalid OrderID: orderID not hexadecimal")
+                raise OrderManagementException("Given string is not hexadecimal")
 
     def validate_orderid(self, order_id):
+        if not isinstance(order_id, str):
+            raise OrderManagementException("Invalid OrderID: OrderID not a string")
+        if len(order_id) != 32:
+            raise OrderManagementException("Invalid OrderID: OrderID length not 32 characters")
         try:
             self.is_hexadecimal(order_id)
         except Exception as exception:
