@@ -1,12 +1,19 @@
 """Module"""
 import json
 import os
+import string
+
 from barcode import EAN13
+
+from .order_shipping import OrderShipping
 from .order_management_exception import OrderManagementException
+from .order_id_not_found_exception import OrderidNotFoundException
 from .order_request import OrderRequest
+
 
 class OrderManager:
     """Class for providing the methods for managing the orders"""
+
     def __init__(self):
         store_path = "../stores/"
         current_path = os.path.dirname(__file__)
@@ -21,28 +28,28 @@ class OrderManager:
             if not os.path.exists(self.__order_request_json_store):
                 with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
                     file.write("[]")
-        except FileNotFoundError as exception: # finish
+        except FileNotFoundError as exception:  # finish
             raise OrderManagementException("Could create/find order_request.json") from exception
 
         try:
             if not os.path.exists(self.__order_manager_json_store):
                 with open(self.__order_manager_json_store, "w", encoding="utf-8") as file:
                     file.write("[]")
-        except FileNotFoundError as exception: # finish
+        except FileNotFoundError as exception:  # finish
             raise OrderManagementException("Could create/find order_manager.json") from exception
 
         try:
             if not os.path.exists(self.__order_shipping_json_store):
                 with open(self.__order_shipping_json_store, "w", encoding="utf-8") as file:
                     file.write("[]")
-        except FileNotFoundError as exception: # finish
+        except FileNotFoundError as exception:  # finish
             raise OrderManagementException("Could create/find order_shipping.json") from exception
 
     @staticmethod
     def validate_ean13(ean13_code):
         """RETURNS TRUE IF THE CODE RECEIVED IS A VALID EAN13,
         OR FALSE IN OTHER CASE"""
-        if len(ean13_code) !=13:
+        if len(ean13_code) != 13:
             raise OrderManagementException("Invalid ean13 code: not a 13 digit string")
         if not ean13_code.isdigit():
             raise OrderManagementException("Invalid ean13 code: not a 13 digit string")
@@ -74,7 +81,8 @@ class OrderManager:
         raise OrderManagementException("Invalid order type: string is invalid")
 
     @classmethod
-    def validate_address(cls, address): #TODO does between mean including 20 and 100 or not including include in write-up
+    def validate_address(cls,
+                         address):  # TODO does between mean including 20 and 100 or not including include in write-up
         if not isinstance(address, str):
             raise OrderManagementException("Invalid address: address is not a string")
         if len(address) > 100:
@@ -86,7 +94,7 @@ class OrderManager:
         return address
 
     @classmethod
-    def validate_phone_number(cls, phone_number): # TODO is the prefix 211 or 34
+    def validate_phone_number(cls, phone_number):  # TODO is the prefix 211 or 34
         if not isinstance(phone_number, str):
             raise OrderManagementException("Invalid phone number: phone number is not a string")
         if len(phone_number) > 12:
@@ -98,7 +106,7 @@ class OrderManager:
         return phone_number
 
     @classmethod
-    def validate_zip_code(cls, zip_code: str): #TODO is the range correct
+    def validate_zip_code(cls, zip_code: str):  # TODO is the range correct
         if not isinstance(zip_code, str):
             raise OrderManagementException("Invalid zip code: zip code not a string")
         if not len(zip_code) == 5:
@@ -122,7 +130,7 @@ class OrderManager:
         self.validate_phone_number(phone_number)
         self.validate_zip_code(zip_code)
 
-        order_request = OrderRequest(product_id, order_type, address, phone_number,zip_code)
+        order_request = OrderRequest(product_id, order_type, address, phone_number, zip_code)
 
         try:
             with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
@@ -134,8 +142,55 @@ class OrderManager:
             raise OrderManagementException("Could not write to file") from exception
         return order_request.order_id
 
+    def validate_orderid(self, order_id):
+        if not isinstance(order_id, str):
+            raise OrderManagementException("Invalid OrderID: OrderID not a string")
+        if len(order_id) != 32:
+            raise OrderManagementException("Invalid OrderID: OrderID length not 32 characters")
+        for ch in order_id:
+            if ch not in string.hexdigits:
+                raise OrderManagementException("Invalid OrderID: orderID not hexadecimal")
 
-    # def send_product (self,input_file_path: str): # SECOND function
+    def send_product(self, input_file_path: str):  # SECOND function
+        try:
+            with open(input_file_path, "r+", encoding="utf-8") as file:
+                data = json.load(file)
+                if "OrderID" not in data:
+                    raise OrderidNotFoundException("order id not found")
+                order_id = data['order_id']
+                self.validate_orderid(order_id)
+        except FileNotFoundError as exception:
+            raise FileNotFoundError(str(exception))
+        except json.decoder.JSONDecodeError as exception:
+            raise json.decoder.JSONDecodeError(str(exception), input_file_path, 0)
+        except OrderidNotFoundException as exception:
+            raise OrderidNotFoundException(str(exception))
+        except Exception as exception:
+            raise OrderManagementException(str(exception))
+
+        #
+        #     if "OrderId" not in dict1:
+        #         print("fixme")
+        #         # TODO throw exception
+        #
+
+        shipping = OrderShipping(data.product_id, data.order_id, data.delivery_phone_number, data.order_type)
+
+        json.dump(shipping, self.__order_shipping_json_store, indent=4)
+
+        return shipping.alg()
+
+        # TODO
+        # validate input file path by checkign that the file exists and that we can read from it
+        # (use self asserts?)
+        # check file exists
+        # check that the file is a json
+        # extract data from json (OrderRequest object)
+        # check that the order id is valid
+        # create the OrderShipping object
+        # write to order shipping object to file
+        # return the SHA256 of the Ordershipping object
+
     #     with ()
     #         dict1 = json.load(input_file_path) # TODO not named dict
     #
@@ -147,13 +202,3 @@ class OrderManager:
     #
     #
     #
-            #TODO
-        # validate input file path by checkign that the file exists and that we can read from it
-        # (use self asserts?)
-        # check file exists
-        # check that the file is a json
-        # extract data from json (OrderRequest object)
-        # check that the order id is valid
-        # create the OrderShipping object
-        # write to order shipping object to file
-        # return the SHA256 of the Ordershipping object

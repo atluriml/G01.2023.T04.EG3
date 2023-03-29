@@ -1,29 +1,10 @@
 
 Running tests...
 ----------------------------------------------------------------------
-..............F..........
-======================================================================
-FAIL [0.004s]: test_product_id_invalid_checksum (test_register_order_tests.RegisterOrderTests)
-test id: CE_NV_3
+...........................
 ----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 59, in testPartExecutor
-    yield
-  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 591, in run
-    self._callTestMethod(testMethod)
-  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 549, in _callTestMethod
-    method()
-  File "/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/unittest/python/test_register_order_tests.py", line 93, in test_product_id_invalid_checksum
-    with self.assertRaises(OrderManagementException) as exception:
-  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 226, in __exit__
-    self._raiseFailure("{} not raised".format(exc_name))
-  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 163, in _raiseFailure
-    raise self.test_case.failureException(msg)
-AssertionError: OrderManagementException not raised
+Ran 27 tests in 0.269s
 
-----------------------------------------------------------------------
-Ran 25 tests in 0.210s
-
-FAILED (failures=1)
+OK
 
 Generating XML reports...
