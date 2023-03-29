@@ -3,10 +3,6 @@ import datetime
 import json
 import os
 import string
-import unittest
-
-from barcode import EAN13
-
 from .order_shipping import OrderShipping
 from .order_management_exception import OrderManagementException
 from .order_id_not_found_exception import OrderidNotFoundException
@@ -25,35 +21,31 @@ class OrderManager:
         self.__order_request_json_store = os.path.join(current_path, store_path, "order_request.json")
         self.__order_manager_json_store = os.path.join(current_path, store_path, "order_manager.json")
         self.__order_shipping_json_store = os.path.join(current_path, store_path, "order_shipping.json")
-        print("Order request store: ", self.__order_request_json_store)
-        print("Order manager store: ", self.__order_manager_json_store)
-        print("Order shipping store: ", self.__order_shipping_json_store)
 
         try:
             if not os.path.exists(self.__order_request_json_store):
                 with open(self.__order_request_json_store, "w", encoding="utf-8") as file:
                     file.write("[]")
-        except FileNotFoundError as exception:  # finish
+        except FileNotFoundError as exception:
             raise OrderManagementException("Could create/find order_request.json") from exception
 
         try:
             if not os.path.exists(self.__order_manager_json_store):
                 with open(self.__order_manager_json_store, "w", encoding="utf-8") as file:
                     file.write("[]")
-        except FileNotFoundError as exception:  # finish
+        except FileNotFoundError as exception:
             raise OrderManagementException("Could create/find order_manager.json") from exception
 
         try:
             if not os.path.exists(self.__order_shipping_json_store):
                 with open(self.__order_shipping_json_store, "w", encoding="utf-8") as file:
                     file.write("[]")
-        except FileNotFoundError as exception:  # finish
+        except FileNotFoundError as exception:
             raise OrderManagementException("Could create/find order_shipping.json") from exception
 
     @staticmethod
     def validate_ean13(ean13_code):
-        """RETURNS TRUE IF THE CODE RECEIVED IS A VALID EAN13,
-        OR FALSE IN OTHER CASE"""
+        """Returns ean13_code if valid, otherwise throws exception"""
         if len(ean13_code) != 13:
             raise OrderManagementException("Invalid ean13 code: not a 13 digit string")
         if not ean13_code.isdigit():
@@ -76,8 +68,9 @@ class OrderManager:
             raise OrderManagementException("Invalid ean13 code: check digit is incorrect")
         return ean13_code
 
+    @classmethod
     def validate_order_type(cls, order_type):
-        """RETURNS ORDER TYPE IF VALID OR THROWS AN EXCEPTION"""
+        """Returns order_type if valid, otherwise throws exception"""
         if not isinstance(order_type, str):
             raise OrderManagementException("Invalid order type: not a string")
         order_type = order_type.lower()
@@ -86,8 +79,8 @@ class OrderManager:
         raise OrderManagementException("Invalid order type: string is invalid")
 
     @classmethod
-    def validate_address(cls,
-                         address):  # TODO does between mean including 20 and 100 or not including include in write-up
+    def validate_address(cls, address):
+        """Returns address if valid, otherwise throws exception"""
         if not isinstance(address, str):
             raise OrderManagementException("Invalid address: address is not a string")
         if len(address) > 100:
@@ -99,7 +92,8 @@ class OrderManager:
         return address
 
     @classmethod
-    def validate_phone_number(cls, phone_number):  # TODO is the prefix 211 or 34
+    def validate_phone_number(cls, phone_number):
+        """Returns phone_number if valid, otherwise throws exception"""
         if not isinstance(phone_number, str):
             raise OrderManagementException("Invalid phone number: phone number is not a string")
         if len(phone_number) > 12:
@@ -111,7 +105,8 @@ class OrderManager:
         return phone_number
 
     @classmethod
-    def validate_zip_code(cls, zip_code: str):  # TODO is the range correct
+    def validate_zip_code(cls, zip_code: str):
+        """Returns zipcode if valid, otherwise throws exception"""
         if not isinstance(zip_code, str):
             raise OrderManagementException("Invalid zip code: zip code not a string")
         if not len(zip_code) == 5:
@@ -124,12 +119,55 @@ class OrderManager:
             raise OrderManagementException("Invalid zip code: zip code is above range")
         return zip_code
 
+    @classmethod
+    def is_hexadecimal(self, check_string : str):
+        for ch in check_string:
+            if ch not in string.hexdigits:
+                raise OrderManagementException("Given string is not hexadecimal")
+
+    @classmethod
+    def validate_orderid(self, order_id):
+        if not isinstance(order_id, str):
+            raise OrderManagementException("Invalid OrderID: OrderID not a string")
+        if len(order_id) != 32:
+            raise OrderManagementException("Invalid OrderID: OrderID length not 32 characters")
+        try:
+            self.is_hexadecimal(order_id)
+        except Exception as exception:
+            raise OrderManagementException("Invalid OrderID: OrderID is not a hexadecimal") from exception
+
+        # opening order request json
+        with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
+            data = json.load(file)
+            if "order_id" not in data:
+                raise OrderidNotFoundException("order id is not found")
+            expected_order_id = data["order_id"]
+        does_order_id_exist = False
+        for order_request_object in data:
+            if order_request_object["OrderRequest.__order_id"] == expected_order_id:
+                does_order_id_exist = True
+                product_id = order_request_object["OrderRequest.__product_id"]
+                order_type = order_request_object["OrderRequest.__order_type"]
+                delivery_address = order_request_object["OrderRequest.__delivery_address"]
+                delivery_phone_number = order_request_object["OrderRequest.__phone_number"]
+                zip_code = order_request_object["OrderRequest.__zip_code"]
+                order_id = order_request_object["OrderRequest.__order_id"]
+        if not does_order_id_exist:
+            raise OrderManagementException("Invalid OrderID: Order does not exist in order request json")
+        assert order_id == expected_order_id, "order id is not valid" #TODO not sure if this is correct
+        return OrderRequest(product_id, order_type, delivery_address, delivery_phone_number, zip_code)
+
+    @classmethod
+    def validate_tracking_code(self, tracking_code):
+        self.is_hexadecimal(tracking_code)
+        #TODO do we need to check anything else in terms of tracking code
+
     # pylint: disable=too-many-arguments
     @freeze_time('2023-03-09')
     def register_order(self, product_id: str, order_type: str, address: str, phone_number: str,
                        zip_code: str) -> str:
 
-        # check validity all of the arguments
+        # check validity of the arguments
         self.validate_ean13(product_id)
         self.validate_order_type(order_type)
         self.validate_address(address)
@@ -143,45 +181,18 @@ class OrderManager:
                 data = json.load(file)
                 data.append(order_request.to_json())
                 file.seek(0)
-                print(data)
                 json.dump(data, file, indent=4)
         except Exception as exception:
-            raise OrderManagementException("Could not write to file") from exception
+            raise OrderManagementException("Could not write to file order_request json") from exception
         return order_request.order_id
 
-    def is_hexadecimal(self, check_string : str):
-        for ch in check_string:
-            if ch not in string.hexdigits:
-                raise OrderManagementException("Given string is not hexadecimal")
-
-    def validate_orderid(self, order_id):
-        if not isinstance(order_id, str):
-            raise OrderManagementException("Invalid OrderID: OrderID not a string")
-        if len(order_id) != 32:
-            raise OrderManagementException("Invalid OrderID: OrderID length not 32 characters")
-        try:
-            self.is_hexadecimal(order_id)
-        except Exception as exception:
-            raise OrderManagementException(str(exception))
-
-        with open(self.__order_request_json_store, "r", encoding="utf-8") as file:
-            data = json.load(file)
-            if "order_id" not in data:
-                raise OrderidNotFoundException("order id is not found")
-            expected_order_id = data["order_id"]
-        assert order_id == expected_order_id, "order id is not valid"
-
-    def validate_tracking_code(self, tracking_code):
-        self.is_hexadecimal(tracking_code)
-
-    def send_product(self, input_file_path: str):  # SECOND function
+    def send_product(self, input_file_path: str):
         try:
             with open(input_file_path, "r+", encoding="utf-8") as file:
                 data = json.load(file)
                 if "OrderID" not in data:
-                    raise OrderidNotFoundException("order id not found")
+                    raise OrderidNotFoundException("Send product: Input file does not have order id")
                 order_id = data["OrderID"]
-                self.validate_orderid(order_id)
         except FileNotFoundError as exception:
             raise FileNotFoundError(str(exception)) from exception
         except json.decoder.JSONDecodeError as exception:
@@ -193,52 +204,57 @@ class OrderManager:
         except Exception as exception:
             raise OrderManagementException(str(exception)) from exception
 
-        shipping = OrderShipping(data["product_id"], data["order_id"], data["delivery_phone_number"],
-                                 data["order_type"])
+        order_request = self.validate_orderid(order_id)
 
-        json.dump(shipping, self.__order_shipping_json_store, indent=4)
+        # creating order shipping object
+        order_shipping = OrderShipping(order_request.product_id, order_request.order_id, order_request.phone_number, order_request.order_type)
 
-        return shipping.alg()
-
-        # TODO
-        # validate input file path by checkign that the file exists and that we can read from it
-        # (use self asserts?)
-        # check file exists
-        # check that the file is a json
-        # extract data from json (OrderRequest object)
-        # check that the order id is valid
-        # create the OrderShipping object
-        # write to order shipping object to file
-        # return the SHA256 of the Ordershipping object
-
-    #     with ()
-    #         dict1 = json.load(input_file_path) # TODO not named dict
-    #
-    #     if "OrderId" not in dict1:
-    #         print("fixme")
-    #         # TODO throw exception
-    #     a = dict1['order_id']
-    #     self.validate_orderId(a) # TODO this method doesn't exist... do we make it?
-    #
-    #
-    #
-
-    def deliver_product(self, tracking_code: str):
-        # check if the tracking code is valid
-        # register tracking code intonto a file the timestamp (UTC time) of the delivery and the tracking code value
-
-        self.validate_tracking_code(tracking_code)
-
-        delivery_time = datetime.utcnow()
-        tracking_and_delivery = "Tracking code"
-
+        # opening order shipping json
         try:
-            with open(self.__order_manager_json_store, "w", encoding="utf-8") as file:
+            with open(self.__order_shipping_json_store, "r+", encoding="utf-8") as file:
                 data = json.load(file)
-                data.append(str(delivery_time).to_json())
+                data.append(order_shipping.to_json())
+                file.seek(0)
                 json.dump(data, file, indent=4)
         except Exception as exception:
-            raise OrderManagementException("Could not write to file") from exception
+            raise OrderManagementException("Error writing Order Shipping information to file") \
+                from exception
 
-        return tracking_code
+        # tracking code of the shipping request is returned
+        return order_shipping.tracking_code
 
+    @freeze_time('2023-03-09')
+    def deliver_product(self, tracking_code: str):
+        self.validate_tracking_code(tracking_code)
+        delivery_time = datetime.utcnow()
+        delivery_day = datetime.timestamp(delivery_time)
+        try:
+            with open(self.__order_shipping_json_store, "r+", encoding="utf-8") as file:
+                data = json.load(file)
+        except Exception as exception:
+            raise OrderManagementException("Could not open order_shipping_json_store") from exception
+
+        # loops through order_shipping json
+        for order_shipping_object in data:
+            if order_shipping_object["OrderShipping.__tracking_code"] == tracking_code:
+                if order_shipping_object["OrderShipping.__delivery_day"] != delivery_day:
+                    raise OrderManagementException("Deliver Product: Invalid delivery day")
+                if order_shipping_object["OrderShipping.__delivery_day"] == delivery_day:
+
+                    # creates json object for delivery
+                    delivery = {
+                        "tracking_code": tracking_code,
+                        "time_stamp": delivery_day
+                    }
+
+                    # opens order manager json which holds the delivery information
+                    try:
+                        with open(self.__order_manager_json_store, "w", encoding="utf-8") as file:
+                            data = json.load(file)
+                            data.append(delivery)
+                            file.seek(0)
+                            json.dump(data, file, indent=4)
+                    except Exception as exception:
+                        raise OrderManagementException("Deliver Product: could not write tracking to file") from exception
+                    return True
+        raise OrderManagementException("Deliver Product: Invalid tracking code")
