@@ -9,7 +9,7 @@ from uc3m_logistics.order_id_not_found_exception import OrderidNotFoundException
 class SendProductTests(unittest.TestCase):
 
     __order_request_json_store = None
-    # TODO we need to use self asserts when we are testing the exceptions (see function 1 tests)
+
     @classmethod
     def setUpClass(cls) -> None:
         store_path = "../../main/python/stores/"
@@ -51,52 +51,40 @@ class SendProductTests(unittest.TestCase):
         except OrderidNotFoundException as exception:
             raise OrderidNotFoundException("OrderID not found")from exception
         except OrderManagementException as exception:
-            raise OrderManagementException("Order Management Exception with Input file")from exception
+            raise OrderManagementException("Order Management Exception with Input file") from exception
         except Exception as exception:
-            raise Exception("Exception with input file")
+            raise Exception("Exception with input file") from exception
 
-    def test_everything(self):
+    def test_send_product_nodes(self):
         file_name = 'send_product_tests/no_error/basic_test.json'
         print(self.__order_manager.send_product(file_name))
 
         directory = 'send_product_tests/json_decode_error'
         for filename in os.listdir(directory):
-            try:
+            with self.assertRaises(json.decoder.JSONDecodeError) as exception:
                 if filename[0] == '.': # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
-            except json.decoder.JSONDecodeError as exception:
-                print("expected exception: ", str(exception))
-            except Exception as exception:
-                print("Non-expected exception")
-                raise Exception(str(exception)) from exception
+            self.assertEqual(exception.exception.msg, "Input file json is incorrect")
 
         directory = 'send_product_tests/order_id_not_found_error'
         for filename in os.listdir(directory):
-            try:
+            with self.assertRaises(OrderidNotFoundException) as exception:
                 if filename[0] == '.': # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
-            except OrderidNotFoundException as exception:
-                print("expected exception: ", str(exception))
-            except Exception as exception:
-                print("Non-expected exception")
-                raise Exception(str(exception))
+            self.assertEqual(exception.exception.message, "OrderID not found")
 
         directory = 'send_product_tests/order_management_error'
         for filename in os.listdir(directory):
-            try:
+            with self.assertRaises(OrderManagementException) as exception:
                 if filename[0] == '.': # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
-            except OrderManagementException as exception:
-                print("expected exception: ", str(exception))
-            except Exception as exception:
-                print("Non-expected exception: ", file_path)
-                print(type(exception))
-                raise Exception(str(exception))
+            self.assertEqual(exception.exception.message, "Order Management Exception with Input file")
+
 if __name__ == '__main__':
     unittest.main()
