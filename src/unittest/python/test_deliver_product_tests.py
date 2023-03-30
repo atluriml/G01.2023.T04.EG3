@@ -79,7 +79,7 @@ class DeliverProductTests(unittest.TestCase):
         return False
 
     def test_path_6(self):
-        # when handling multiple entries, idk if i did this right lol
+        # when handling multiple entries
         product_id = "8421691423220"
         order_id = "7628fa19bcb8e965bb73f8a180718f99"
         phone_number = "+34123456789"
