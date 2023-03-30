@@ -178,6 +178,7 @@ class OrderManager:
             raise OrderManagementException("Could not write to file order_request json") from exception
         return order_request.order_id
 
+    @freeze_time('2023-03-09')
     def send_product(self, input_file_path: str):
         try:
             with open(input_file_path, "r+", encoding="utf-8") as file:
@@ -211,7 +212,7 @@ class OrderManager:
         # tracking code of the shipping request is returned
         return order_shipping.tracking_code
 
-    @freeze_time('2023-03-09')
+    @freeze_time('2023-03-10')
     def deliver_product(self, tracking_code: str):
         self.validate_tracking_code(tracking_code)
         delivery_time = datetime.utcnow()
@@ -221,26 +222,24 @@ class OrderManager:
                 data = json.load(file)
         except Exception as exception:
             raise OrderManagementException("Could not open order_shipping_json_store") from exception
-
         # loops through order_shipping json
-        for order_shipping_object in data:
-            if order_shipping_object["OrderShipping.__tracking_code"] == tracking_code:
-                if order_shipping_object["OrderShipping.__delivery_day"] != delivery_day:
-                    raise OrderManagementException("Deliver Product: Invalid delivery day")
+        if data["tracking_code"] == tracking_code:
+            if data["delivery_day"] != delivery_day:
+                raise OrderManagementException("Deliver Product: Invalid delivery day")
 
-                # creates json object for delivery
-                delivery = {
-                    "tracking_code": tracking_code,
-                    "time_stamp": delivery_day
-                }
-                # opens order manager json which holds the delivery information
-                try:
-                    with open(self.__order_manager_json_store, "w", encoding="utf-8") as file:
-                        data = json.load(file)
-                        data.append(delivery)
-                        file.seek(0)
-                        json.dump(data, file, indent=4)
-                except Exception as exception:
-                    raise OrderManagementException("Deliver Product: could not write tracking to file") from exception
-                return True
+            # creates json object for delivery
+            delivery = {
+                "tracking_code": tracking_code,
+                "time_stamp": delivery_day
+            }
+            # opens order manager json which holds the delivery information
+            try:
+                with open(self.__order_manager_json_store, "r+", encoding="utf-8") as file:
+                    data = json.load(file)
+                    data.append(delivery)
+                    file.seek(0)
+                    json.dump(data, file, indent=4)
+            except Exception as exception:
+                raise OrderManagementException("Deliver Product: could not write tracking to file") from exception
+            return True
         raise OrderManagementException("Deliver Product: Invalid tracking code")

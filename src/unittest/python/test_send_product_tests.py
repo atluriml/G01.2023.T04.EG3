@@ -9,7 +9,7 @@ from uc3m_logistics.order_id_not_found_exception import OrderidNotFoundException
 class SendProductTests(unittest.TestCase):
 
     __order_request_json_store = None
-
+    # TODO we need to use self asserts when we are testing the exceptions (see function 1 tests)
     @classmethod
     def setUpClass(cls) -> None:
         store_path = "../../main/python/stores/"
