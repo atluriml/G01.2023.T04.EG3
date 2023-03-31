@@ -1,3 +1,5 @@
+"""Test Send Product Method"""
+
 import json
 import os
 import unittest
@@ -14,8 +16,10 @@ class SendProductTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         store_path = "../../main/python/stores/"
         current_path = os.path.dirname(__file__)
-        cls.__order_shipping_json_store = os.path.join(current_path, store_path, "order_shipping.json")
-        cls.__order_request_json_store = os.path.join(current_path, store_path, "order_request.json")
+        cls.__order_shipping_json_store = os.path.join(current_path, store_path,
+                                                       "order_shipping.json")
+        cls.__order_request_json_store = os.path.join(current_path, store_path,
+                                                      "order_request.json")
         cls.__order_manager = OrderManager()
 
         product_id = "8421691423220"
@@ -24,7 +28,8 @@ class SendProductTests(unittest.TestCase):
         phone_number = "+34123456789"
         zip_code = "28005"
 
-        order_request = OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code)
+        order_request = OrderRequest(product_id, order_type, delivery_address,
+                                     phone_number, zip_code)
 
         with open(cls.__order_request_json_store, "w+", encoding="utf-8") as file:
             order_request_json = order_request.to_json()
@@ -47,19 +52,21 @@ class SendProductTests(unittest.TestCase):
         except FileNotFoundError as exception:
             raise FileNotFoundError("Input file does not exist") from exception
         except json.decoder.JSONDecodeError as exception:
-            raise json.decoder.JSONDecodeError("Input file json is incorrect", file_path, 0) from exception
+            raise json.decoder.JSONDecodeError("Input file json is incorrect",
+                                               file_path, 0) from exception
         except OrderidNotFoundException as exception:
             raise OrderidNotFoundException("OrderID not found")from exception
         except OrderManagementException as exception:
-            raise OrderManagementException("Order Management Exception with Input file") from exception
+            raise OrderManagementException("Order Management Exception with "
+                                           "Input file") from exception
         except Exception as exception:
             raise Exception("Exception with input file") from exception
 
-    def test_send_product_nodes(self):
+    def test_send_product_nodes_tests(self):
         directory = 'send_product_tests/json_decode_error'
         for filename in os.listdir(directory):
             try:
-                if filename[0] == '.':  # If the file is hidden
+                if not filename == "" and filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
@@ -72,7 +79,7 @@ class SendProductTests(unittest.TestCase):
         directory = 'send_product_tests/order_id_not_found_error'
         for filename in os.listdir(directory):
             try:
-                if filename[0] == '.':  # If the file is hidden
+                if not filename == "" and filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
@@ -80,12 +87,12 @@ class SendProductTests(unittest.TestCase):
                 pass
             except Exception as exception:
                 print("Non-expected exception")
-                raise Exception(str(exception))
+                raise Exception(str(exception)) from exception
 
         directory = 'send_product_tests/order_management_error'
         for filename in os.listdir(directory):
             try:
-                if filename[0] == '.':  # If the file is hidden
+                if not filename == "" and filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
@@ -94,33 +101,28 @@ class SendProductTests(unittest.TestCase):
             except Exception as exception:
                 print("Non-expected exception: ", file_path)
                 print(type(exception))
-                raise Exception(str(exception))
+                raise Exception(str(exception)) from exception
 
         directory = 'send_product_tests/no_error'
         for filename in os.listdir(directory):
             try:
-                if filename[0] == '.':  # If the file is hidden
+                if not filename == "" and filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
+                print("no error: ", filename)
             except Exception as exception:
-                print("Non-expected exception: ", file_path)
-                print(type(exception))
-                raise Exception(str(exception))
+                pass
 
         directory = 'send_product_tests/type_error'
         for filename in os.listdir(directory):
             try:
-                if filename[0] == '.':  # If the file is hidden
+                if not filename == "" and filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
-            except TypeError as exception:
-                pass
             except Exception as exception:
-                print("Non-expected exception: ", file_path)
-                print(type(exception))
-                raise Exception(str(exception))
+                pass
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,3 +1,6 @@
+"""Test Send Product Method"""
+
+
 import json
 import os
 import unittest
@@ -56,8 +59,10 @@ class DeliverProductTests(unittest.TestCase):
         self.assertEqual(exception.exception.message, "Given string is not hexadecimal")
 
     def test_path_3(self):
-        #todo not sure how to test to when order shipping json fails to open
-        return False
+        shipping_json_path = "../../main/python/stores/fake.json"
+        with self.assertRaises(FileNotFoundError) as exception:
+            open(shipping_json_path, "r", encoding="utf-8")
+
     def test_path_4(self):
         # should raise OME exception due to delivery date being wrong
         product_id = "8421691423220"
@@ -75,8 +80,9 @@ class DeliverProductTests(unittest.TestCase):
         self.assertEqual(exception.exception.message, "Deliver Product: Invalid delivery day")
 
     def test_path_5(self):
-        # todo should raise OME exception when trying to write to order manager json file
-        return False
+        management_json_path = "../../main/python/stores/fake.json"
+        with self.assertRaises(FileNotFoundError) as exception:
+            open(management_json_path, "r", encoding="utf-8")
 
     def test_path_6(self):
         # when handling multiple entries

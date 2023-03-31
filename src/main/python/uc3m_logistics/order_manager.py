@@ -136,10 +136,12 @@ class OrderManager:
             self.is_hexadecimal(order_id)
         except Exception as exception:
             raise OrderManagementException("Invalid OrderID: OrderID is not a hexadecimal") from exception
+
+        expected_order_id = ""
         # opening order request json
         with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
             data = json.load(file)
-        if data["OrderRequest.__order_id"] == order_id:
+        if "OrderRequest.__order_id" in data and data["OrderRequest.__order_id"] == order_id:
             does_order_id_exist = True
             product_id = data["OrderRequest.__product_id"]
             order_type = data["OrderRequest.__order_type"]
@@ -183,9 +185,9 @@ class OrderManager:
     def validate_tracking_code(cls, tracking_code):
         if not isinstance(tracking_code, str):
             raise OrderManagementException("Tracking code not a string")
-        #regex = '[0-9a-fA-F]{64}'
-        #if not re.search(regex, tracking_code):
-        #    raise OrderManagementException("Tracking code regex incorrect")
+        for ch in tracking_code:
+            if not ch in "0123456789abcdef":
+                raise OrderManagementException("Given string is not hexadecimal")
 
 
     # pylint: disable=too-many-arguments
