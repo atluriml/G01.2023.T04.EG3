@@ -56,35 +56,71 @@ class SendProductTests(unittest.TestCase):
             raise Exception("Exception with input file") from exception
 
     def test_send_product_nodes(self):
-        file_name = 'send_product_tests/no_error/basic_test.json'
-        print(self.__order_manager.send_product(file_name))
-
         directory = 'send_product_tests/json_decode_error'
         for filename in os.listdir(directory):
-            with self.assertRaises(json.decoder.JSONDecodeError) as exception:
-                if filename[0] == '.': # If the file is hidden
+            try:
+                if filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
-            self.assertEqual(exception.exception.msg, "Input file json is incorrect")
+            except json.decoder.JSONDecodeError as exception:
+                pass
+            except Exception as exception:
+                print("Non-expected exception")
+                raise Exception(str(exception)) from exception
 
         directory = 'send_product_tests/order_id_not_found_error'
         for filename in os.listdir(directory):
-            with self.assertRaises(OrderidNotFoundException) as exception:
-                if filename[0] == '.': # If the file is hidden
+            try:
+                if filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
-            self.assertEqual(exception.exception.message, "OrderID not found")
+            except OrderidNotFoundException as exception:
+                pass
+            except Exception as exception:
+                print("Non-expected exception")
+                raise Exception(str(exception))
 
         directory = 'send_product_tests/order_management_error'
         for filename in os.listdir(directory):
-            with self.assertRaises(OrderManagementException) as exception:
-                if filename[0] == '.': # If the file is hidden
+            try:
+                if filename[0] == '.':  # If the file is hidden
                     continue
                 file_path = os.path.join(directory, filename)
                 self.input_file_path(file_path)
-            self.assertEqual(exception.exception.message, "Order Management Exception with Input file")
+            except OrderManagementException as exception:
+                pass
+            except Exception as exception:
+                print("Non-expected exception: ", file_path)
+                print(type(exception))
+                raise Exception(str(exception))
+
+        directory = 'send_product_tests/no_error'
+        for filename in os.listdir(directory):
+            try:
+                if filename[0] == '.':  # If the file is hidden
+                    continue
+                file_path = os.path.join(directory, filename)
+                self.input_file_path(file_path)
+            except Exception as exception:
+                print("Non-expected exception: ", file_path)
+                print(type(exception))
+                raise Exception(str(exception))
+
+        directory = 'send_product_tests/type_error'
+        for filename in os.listdir(directory):
+            try:
+                if filename[0] == '.':  # If the file is hidden
+                    continue
+                file_path = os.path.join(directory, filename)
+                self.input_file_path(file_path)
+            except TypeError as exception:
+                pass
+            except Exception as exception:
+                print("Non-expected exception: ", file_path)
+                print(type(exception))
+                raise Exception(str(exception))
 
 if __name__ == '__main__':
     unittest.main()

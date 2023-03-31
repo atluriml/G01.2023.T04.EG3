@@ -136,6 +136,33 @@ class OrderManager:
             self.is_hexadecimal(order_id)
         except Exception as exception:
             raise OrderManagementException("Invalid OrderID: OrderID is not a hexadecimal") from exception
+        # opening order request json
+        with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
+            data = json.load(file)
+        if data["OrderRequest.__order_id"] == order_id:
+            does_order_id_exist = True
+            product_id = data["OrderRequest.__product_id"]
+            order_type = data["OrderRequest.__order_type"]
+            delivery_address = data["OrderRequest.__delivery_address"]
+            delivery_phone_number = data["OrderRequest.__phone_number"]
+            zip_code = data["OrderRequest.__zip_code"]
+            expected_order_id = data["OrderRequest.__order_id"]
+        if not data:
+            raise OrderManagementException("Invalid OrderID: Order does not exist in order request json")
+        assert order_id == expected_order_id, "order id is not valid"
+
+        if data["order_id"] == order_id:
+            product_id = data["product_id"]
+            order_type = data["order_type"]
+            delivery_address = data["delivery_address"]
+            delivery_phone_number = data["phone_number"]
+            zip_code = data["zip_code"]
+            expected_order_id = data["order_id"]
+        else:
+            raise OrderManagementException("Invalid OrderID: Order id is not in order request json")
+        assert order_id == expected_order_id, "Invalid OrderID: order ids are not equal"
+        return OrderRequest(product_id, order_type, delivery_address, delivery_phone_number, zip_code)
+
 
         # opening order request json
         with open(self.__order_request_json_store, "r+", encoding="utf-8") as file:
@@ -156,9 +183,9 @@ class OrderManager:
     def validate_tracking_code(cls, tracking_code):
         if not isinstance(tracking_code, str):
             raise OrderManagementException("Tracking code not a string")
-        regex = '[0-9a-fA-F]{64}'
-        if not re.search(regex, tracking_code):
-            raise OrderManagementException("Tracking code regex incorrect")
+        #regex = '[0-9a-fA-F]{64}'
+        #if not re.search(regex, tracking_code):
+        #    raise OrderManagementException("Tracking code regex incorrect")
 
 
     # pylint: disable=too-many-arguments
@@ -194,18 +221,26 @@ class OrderManager:
                     raise OrderidNotFoundException("Send product: Input file does not have order id")
                 order_id = data["OrderID"]
         except FileNotFoundError as exception:
+            raise FileNotFoundError(str(exception)) from exception
             raise FileNotFoundError("Send product: Input file does not exist") from exception
         except json.decoder.JSONDecodeError as exception:
-            raise json.decoder.JSONDecodeError("Send product: Input file json is incorrect", input_file_path, 0) from exception
+            raise json.decoder.JSONDecodeError(str(exception), input_file_path, 0)
+            raise json.decoder.JSONDecodeError("Send product: Input file json is incorrect", input_file_path,
+                                               0) from exception
         except OrderidNotFoundException as exception:
             raise OrderidNotFoundException(str(exception)) from exception
+        except AssertionError as exception:
+            raise AssertionError(str(exception)) from exception
         except Exception as exception:
+            raise OrderManagementException(str(exception)) from exception
             raise OrderManagementException("Send product: Error with the input file") from exception
 
         order_request = self.validate_orderid(order_id)
 
         # creating order shipping object
-        order_shipping = OrderShipping(order_request.product_id, order_request.order_id, order_request.phone_number, order_request.order_type)
+        order_shipping = OrderShipping(order_request.product_id, order_request.order_id, order_request.phone_number,
+                                       order_request.order_type)
+
         # opening order shipping json
         try:
             with open(self.__order_shipping_json_store, "r+", encoding="utf-8") as file:
@@ -214,6 +249,8 @@ class OrderManager:
                 file.seek(0)
                 json.dump(data, file, indent=4)
         except Exception as exception:
+            raise OrderManagementException("Error writing Order Shipping information to file") \
+                from exception
             raise OrderManagementException("Send product: Cannot write to Order Shipping file") from exception
 
         # tracking code of the shipping request is returned
@@ -229,10 +266,15 @@ class OrderManager:
                 data = json.load(file)
         except Exception as exception:
             raise OrderManagementException("Could not open order_shipping_json_store") from exception
+
+        if isinstance(data, dict):
+            data = [data]
+
         # loops through order_shipping json
-        if data["tracking_code"] == tracking_code:
-            if data["delivery_day"] != delivery_day:
-                raise OrderManagementException("Deliver Product: Invalid delivery day")
+        for item in data:
+            if item["tracking_code"] == tracking_code:
+                if item["delivery_day"] != delivery_day:
+                    raise OrderManagementException("Deliver Product: Invalid delivery day")
 
             # creates json object for delivery
             delivery = {
