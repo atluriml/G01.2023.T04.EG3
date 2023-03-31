@@ -1,10 +1,35 @@
 
 Running tests...
 ----------------------------------------------------------------------
-...........................
+...........................E......
+======================================================================
+ERROR [0.007s]: test_send_product_nodes (test_send_product_tests.SendProductTests)
 ----------------------------------------------------------------------
-Ran 27 tests in 0.269s
+Traceback (most recent call last):
+  File "/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/main/python/uc3m_logistics/order_manager.py", line 184, in send_product
+    with open(input_file_path, "r+", encoding="utf-8") as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'send_product_tests/no_error/basic_test.json'
 
-OK
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 59, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 591, in run
+    self._callTestMethod(testMethod)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py", line 549, in _callTestMethod
+    method()
+  File "/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/unittest/python/test_send_product_tests.py", line 60, in test_send_product_nodes
+    print(self.__order_manager.send_product(file_name))
+  File "/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/venv/lib/python3.10/site-packages/freezegun/api.py", line 809, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/main/python/uc3m_logistics/order_manager.py", line 190, in send_product
+    raise FileNotFoundError("Send product: Input file does not exist") from exception
+FileNotFoundError: Send product: Input file does not exist
+
+----------------------------------------------------------------------
+Ran 34 tests in 0.467s
+
+FAILED (errors=1)
 
 Generating XML reports...

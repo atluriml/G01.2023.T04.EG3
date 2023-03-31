@@ -1,5 +1,10 @@
 {
-  "errors": [],
+  "errors": [
+    {
+      "test": "test_send_product_tests.SendProductTests.test_send_product_nodes",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/main/python/uc3m_logistics/order_manager.py\", line 184, in send_product\n    with open(input_file_path, \"r+\", encoding=\"utf-8\") as file:\nFileNotFoundError: [Errno 2] No such file or directory: 'send_product_tests/no_error/basic_test.json'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py\", line 59, in testPartExecutor\n    yield\n  File \"/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py\", line 591, in run\n    self._callTestMethod(testMethod)\n  File \"/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/case.py\", line 549, in _callTestMethod\n    method()\n  File \"/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/unittest/python/test_send_product_tests.py\", line 60, in test_send_product_nodes\n    print(self.__order_manager.send_product(file_name))\n  File \"/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/venv/lib/python3.10/site-packages/freezegun/api.py\", line 809, in wrapper\n    result = func(*args, **kwargs)\n  File \"/Users/sarahhoover/PycharmProjects/G01.2023.T04.EG3/src/main/python/uc3m_logistics/order_manager.py\", line 190, in send_product\n    raise FileNotFoundError(\"Send product: Input file does not exist\") from exception\nFileNotFoundError: Send product: Input file does not exist\n"
+    }
+  ],
   "failures": [],
-  "tests-run": 27
+  "tests-run": 34
 }

@@ -3,6 +3,8 @@ import datetime
 import json
 import os
 import string
+import re
+
 from .order_shipping import OrderShipping
 from .order_management_exception import OrderManagementException
 from .order_id_not_found_exception import OrderidNotFoundException
@@ -151,8 +153,13 @@ class OrderManager:
         return OrderRequest(product_id, order_type, delivery_address, delivery_phone_number, zip_code)
 
     @classmethod
-    def validate_tracking_code(self, tracking_code):
-        self.is_hexadecimal(tracking_code)
+    def validate_tracking_code(cls, tracking_code):
+        if not isinstance(tracking_code, str):
+            raise OrderManagementException("Tracking code not a string")
+        regex = '[0-9a-fA-F]{64}'
+        if not re.search(regex, tracking_code):
+            raise OrderManagementException("Tracking code regex incorrect")
+
 
     # pylint: disable=too-many-arguments
     @freeze_time('2023-03-09')
